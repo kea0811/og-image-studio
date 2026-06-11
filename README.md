@@ -4,7 +4,7 @@
 ![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**🌐 [Live demo →](https://og-image-studio.vercel.app)**
+**🌐 [Live demo →](https://og-image-studio-jet.vercel.app)**
 
 > Design Open Graph images in your browser — text, gradients, image backgrounds, and one-click PNG export.
 
