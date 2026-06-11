@@ -22,7 +22,15 @@ export function Preview({
   }, [config, image, canvasRef]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 shadow-glow">
+    <div
+      className="overflow-hidden rounded-xl border border-white/10"
+      style={{
+        backgroundImage:
+          'linear-gradient(45deg, rgba(255,255,255,0.025) 25%, transparent 25%), linear-gradient(-45deg, rgba(255,255,255,0.025) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.025) 75%), linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.025) 75%)',
+        backgroundSize: '20px 20px',
+        backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
+      }}
+    >
       <canvas
         ref={canvasRef}
         width={config.width}

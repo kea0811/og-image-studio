@@ -144,28 +144,40 @@ export function Editor() {
   const bg = config.background;
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_440px]">
       {/* Preview column */}
       <div className="lg:sticky lg:top-8 lg:self-start">
-        <Preview config={config} image={image} canvasRef={canvasRef} />
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={handleExport}
-            className="rounded-xl bg-violet-500 px-5 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-violet-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
-          >
-            Download PNG
-          </button>
-          <button
-            type="button"
-            onClick={copyMeta}
-            className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
-          >
-            Copy meta tags
-          </button>
-          <span className="text-xs text-slate-500" role="status" aria-live="polite">
-            {status || `${config.width}×${config.height}px`}
-          </span>
+        <div className="rounded-2xl border border-white/10 bg-ink-900/40 p-3 shadow-glow">
+          <div className="mb-3 flex items-center justify-between gap-3 px-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+                Preview
+              </span>
+              <span className="font-mono text-[11px] text-slate-400">
+                {config.width} × {config.height}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={copyMeta}
+                className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
+              >
+                Copy meta tags
+              </button>
+              <button
+                type="button"
+                onClick={handleExport}
+                className="rounded-lg bg-violet-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow transition hover:bg-violet-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
+              >
+                Download PNG
+              </button>
+            </div>
+          </div>
+          <Preview config={config} image={image} canvasRef={canvasRef} />
+          <div className="mt-2 min-h-[1.25rem] px-1 text-[11px] text-slate-500" role="status" aria-live="polite">
+            {status}
+          </div>
         </div>
       </div>
 

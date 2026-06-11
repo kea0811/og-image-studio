@@ -2,7 +2,7 @@ import { Editor } from '@/components/Editor';
 
 export default function HomePage() {
   return (
-    <main className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+    <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
       <header className="mb-10 flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-violet-500 to-blue-500 text-sm font-bold text-white">
