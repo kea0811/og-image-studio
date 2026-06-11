@@ -196,8 +196,8 @@ export function Editor() {
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_440px]">
-      {/* Preview column */}
-      <div className="lg:sticky lg:top-8 lg:self-start">
+      {/* Preview column — preview pinned at top, meta panel scrolls below it */}
+      <div className="flex flex-col gap-5 lg:self-start">
         <div className="rounded-2xl border border-white/10 bg-ink-900/40 p-3 shadow-glow">
           <div className="mb-3 flex items-center justify-between gap-3 px-1">
             <div className="flex items-center gap-2">
@@ -230,106 +230,6 @@ export function Editor() {
             {status}
           </div>
         </div>
-      </div>
-
-      {/* Controls column */}
-      <div className="flex flex-col gap-5">
-        <Panel title="Presets">
-          <div className="grid grid-cols-2 gap-2">
-            {presets.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                onClick={() => setConfig(structuredClone(preset.config))}
-                className="rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-slate-200 transition hover:border-violet-400/60 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-400"
-              >
-                {preset.name}
-              </button>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel title="Content">
-          <TextArea
-            id="title-text"
-            label="Title"
-            value={config.title.text}
-            onChange={(text) => updateLayer('title', { text })}
-          />
-          <LayerStyle layer={config.title} idPrefix="title" onChange={(patch) => updateLayer('title', patch)} />
-
-          <div className="flex items-center gap-2 pt-1">
-            <input
-              id="subtitle-toggle"
-              type="checkbox"
-              checked={config.subtitle !== null}
-              onChange={(event) =>
-                setConfig((current) => ({
-                  ...current,
-                  subtitle: event.target.checked ? DEFAULT_SUBTITLE : null,
-                }))
-              }
-              className="h-4 w-4 rounded border-white/20 bg-ink-800 accent-violet-500"
-            />
-            <label htmlFor="subtitle-toggle" className="text-sm font-medium text-slate-300">
-              Show subtitle
-            </label>
-          </div>
-
-          {config.subtitle ? (
-            <>
-              <TextArea
-                id="subtitle-text"
-                label="Subtitle"
-                value={config.subtitle.text}
-                onChange={(text) => updateLayer('subtitle', { text })}
-              />
-              <LayerStyle
-                layer={config.subtitle}
-                idPrefix="subtitle"
-                onChange={(patch) => updateLayer('subtitle', patch)}
-              />
-            </>
-          ) : null}
-        </Panel>
-
-        <Panel title="Background">
-          <Segmented
-            label="Type"
-            value={bg.type}
-            options={BG_OPTIONS}
-            onChange={(type) => updateBackground(backgroundForType(type, bg))}
-          />
-
-          {bg.type === 'solid' ? (
-            <ColorInput
-              id="bg-solid"
-              label="Colour"
-              value={bg.color}
-              onChange={(color) => updateBackground({ type: 'solid', color })}
-            />
-          ) : null}
-
-          {bg.type === 'gradient' ? (
-            <GradientControls value={bg} onChange={updateBackground} />
-          ) : null}
-
-          {bg.type === 'image' ? (
-            <ImageControls value={bg} onChange={updateBackground} onFile={handleFile} />
-          ) : null}
-        </Panel>
-
-        <Panel title="Layout">
-          <Slider
-            id="padding"
-            label="Padding"
-            min={24}
-            max={160}
-            value={config.padding}
-            suffix="px"
-            onChange={(padding) => setConfig((current) => ({ ...current, padding }))}
-          />
-        </Panel>
 
         <Panel title="Meta tags">
           <div className="flex flex-col gap-3">
@@ -433,6 +333,106 @@ export function Editor() {
               </p>
             </div>
           </div>
+        </Panel>
+      </div>
+
+      {/* Controls column */}
+      <div className="flex flex-col gap-5">
+        <Panel title="Presets">
+          <div className="grid grid-cols-2 gap-2">
+            {presets.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => setConfig(structuredClone(preset.config))}
+                className="rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-slate-200 transition hover:border-violet-400/60 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet-400"
+              >
+                {preset.name}
+              </button>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel title="Content">
+          <TextArea
+            id="title-text"
+            label="Title"
+            value={config.title.text}
+            onChange={(text) => updateLayer('title', { text })}
+          />
+          <LayerStyle layer={config.title} idPrefix="title" onChange={(patch) => updateLayer('title', patch)} />
+
+          <div className="flex items-center gap-2 pt-1">
+            <input
+              id="subtitle-toggle"
+              type="checkbox"
+              checked={config.subtitle !== null}
+              onChange={(event) =>
+                setConfig((current) => ({
+                  ...current,
+                  subtitle: event.target.checked ? DEFAULT_SUBTITLE : null,
+                }))
+              }
+              className="h-4 w-4 rounded border-white/20 bg-ink-800 accent-violet-500"
+            />
+            <label htmlFor="subtitle-toggle" className="text-sm font-medium text-slate-300">
+              Show subtitle
+            </label>
+          </div>
+
+          {config.subtitle ? (
+            <>
+              <TextArea
+                id="subtitle-text"
+                label="Subtitle"
+                value={config.subtitle.text}
+                onChange={(text) => updateLayer('subtitle', { text })}
+              />
+              <LayerStyle
+                layer={config.subtitle}
+                idPrefix="subtitle"
+                onChange={(patch) => updateLayer('subtitle', patch)}
+              />
+            </>
+          ) : null}
+        </Panel>
+
+        <Panel title="Background">
+          <Segmented
+            label="Type"
+            value={bg.type}
+            options={BG_OPTIONS}
+            onChange={(type) => updateBackground(backgroundForType(type, bg))}
+          />
+
+          {bg.type === 'solid' ? (
+            <ColorInput
+              id="bg-solid"
+              label="Colour"
+              value={bg.color}
+              onChange={(color) => updateBackground({ type: 'solid', color })}
+            />
+          ) : null}
+
+          {bg.type === 'gradient' ? (
+            <GradientControls value={bg} onChange={updateBackground} />
+          ) : null}
+
+          {bg.type === 'image' ? (
+            <ImageControls value={bg} onChange={updateBackground} onFile={handleFile} />
+          ) : null}
+        </Panel>
+
+        <Panel title="Layout">
+          <Slider
+            id="padding"
+            label="Padding"
+            min={24}
+            max={160}
+            value={config.padding}
+            suffix="px"
+            onChange={(padding) => setConfig((current) => ({ ...current, padding }))}
+          />
         </Panel>
       </div>
     </div>
