@@ -117,6 +117,38 @@ export function Editor() {
     setMetaSnippet(computedMetaSnippet);
   }, [computedMetaSnippet]);
 
+  // Snapshot of the main canvas, used as the thumbnail in the social-card mock.
+  // Updates after each canvas render via a debounced rAF so we don't toDataURL
+  // on every keystroke.
+  const [cardThumb, setCardThumb] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const id = window.setTimeout(() => {
+      if (cancelled) return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      try {
+        setCardThumb(canvas.toDataURL('image/png'));
+      } catch {
+        // External image background without CORS taints the canvas — fall back to no thumb.
+        setCardThumb(null);
+      }
+    }, 200);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, [config, image]);
+
+  const cardHost = useMemo(() => {
+    try {
+      return new URL(metaPageUrl).host || 'your-site.com';
+    } catch {
+      return metaPageUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '') || 'your-site.com';
+    }
+  }, [metaPageUrl]);
+  const cardDescription = metaDescription || config.subtitle?.text || '';
+
   const updateLayer = useCallback((key: 'title' | 'subtitle', patch: Partial<TextLayer>) => {
     setConfig((current) => {
       const layer = key === 'title' ? current.title : current.subtitle;
@@ -341,9 +373,44 @@ export function Editor() {
               />
             </div>
             <div>
+              <div className="mb-1 text-xs font-medium text-slate-400">
+                Social card preview <span className="text-slate-600">(how it will look when shared)</span>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-white/10 bg-ink-950/60">
+                {cardThumb ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={cardThumb}
+                    alt=""
+                    className="block w-full"
+                    style={{ aspectRatio: `${config.width} / ${config.height}`, objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div
+                    className="block w-full bg-ink-800/60"
+                    style={{ aspectRatio: `${config.width} / ${config.height}` }}
+                  />
+                )}
+                <div className="border-t border-white/5 bg-ink-900/80 px-3 py-2.5">
+                  <div className="mb-0.5 text-[10px] uppercase tracking-[0.08em] text-slate-500">
+                    {cardHost}
+                  </div>
+                  <div className="line-clamp-2 text-[13px] font-semibold leading-snug text-slate-100">
+                    {config.title.text || 'Untitled card'}
+                  </div>
+                  {cardDescription ? (
+                    <div className="mt-1 line-clamp-2 text-[11px] text-slate-400">
+                      {cardDescription}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            <div>
               <div className="mb-1 flex items-center justify-between">
                 <label htmlFor="meta-snippet" className="text-xs font-medium text-slate-400">
-                  Preview (editable)
+                  Snippet (editable)
                 </label>
                 <button
                   type="button"
