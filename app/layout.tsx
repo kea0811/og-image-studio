@@ -17,6 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://og-image-studio-jet.vercel.app'),
   title: 'OG Image Studio — design Open Graph images in your browser',
   description:
     'A visual editor for Open Graph / social-share images. Add text, gradients and image backgrounds, then export a pixel-perfect PNG — no design tool required.',
@@ -33,6 +34,21 @@ export const metadata: Metadata = {
     title: 'OG Image Studio',
     description: 'Design Open Graph images in your browser and export them as PNG.',
     type: 'website',
+    url: 'https://og-image-studio-jet.vercel.app',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'OG Image Studio — design Open Graph images in your browser',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'OG Image Studio',
+    description: 'Design Open Graph images in your browser and export them as PNG.',
+    images: ['/og-image.png'],
   },
 };
 
