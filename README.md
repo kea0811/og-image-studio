@@ -3,9 +3,6 @@
 ![tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)
 ![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
-![npm version](https://img.shields.io/npm/v/og-image-studio.svg)
-![npm downloads](https://img.shields.io/npm/dm/og-image-studio.svg)
-![bundle size](https://img.shields.io/bundlephobia/minzip/og-image-studio?label=gzip)
 
 **🌐 [Live demo →](https://og-image-studio.vercel.app)**
 
