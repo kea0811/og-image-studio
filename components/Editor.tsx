@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FONT_OPTIONS, createDefaultConfig } from '@/src/lib/config';
 import { listPresets } from '@/src/lib/presets';
 import { exportCanvasAsPng } from '@/src/lib/export';
@@ -87,16 +87,35 @@ export function Editor() {
   const image = useLoadedImage(imageSrc || null);
 
   const presets = useMemo(() => listPresets(), []);
-  const metaSnippet = useMemo(
-    () =>
-      [
-        '<meta property="og:image" content="https://your-site.com/og.png" />',
-        `<meta property="og:image:width" content="${config.width}" />`,
-        `<meta property="og:image:height" content="${config.height}" />`,
-        '<meta name="twitter:card" content="summary_large_image" />',
-      ].join('\n'),
-    [config.width, config.height],
-  );
+  const [metaImageUrl, setMetaImageUrl] = useState('https://your-site.com/og.png');
+  const [metaPageUrl, setMetaPageUrl] = useState('https://your-site.com');
+  const [metaDescription, setMetaDescription] = useState('');
+
+  const computedMetaSnippet = useMemo(() => {
+    const titleText = config.title.text || '';
+    const descText = metaDescription || config.subtitle?.text || '';
+    const lines: string[] = [];
+    lines.push('<!-- Open Graph -->');
+    if (titleText) lines.push(`<meta property="og:title" content=${JSON.stringify(titleText)} />`);
+    if (descText) lines.push(`<meta property="og:description" content=${JSON.stringify(descText)} />`);
+    if (metaPageUrl) lines.push(`<meta property="og:url" content=${JSON.stringify(metaPageUrl)} />`);
+    lines.push('<meta property="og:type" content="website" />');
+    lines.push(`<meta property="og:image" content=${JSON.stringify(metaImageUrl || 'https://your-site.com/og.png')} />`);
+    lines.push(`<meta property="og:image:width" content="${config.width}" />`);
+    lines.push(`<meta property="og:image:height" content="${config.height}" />`);
+    lines.push('');
+    lines.push('<!-- Twitter / X -->');
+    lines.push('<meta name="twitter:card" content="summary_large_image" />');
+    if (titleText) lines.push(`<meta name="twitter:title" content=${JSON.stringify(titleText)} />`);
+    if (descText) lines.push(`<meta name="twitter:description" content=${JSON.stringify(descText)} />`);
+    lines.push(`<meta name="twitter:image" content=${JSON.stringify(metaImageUrl || 'https://your-site.com/og.png')} />`);
+    return lines.join('\n');
+  }, [config.title.text, config.subtitle, config.width, config.height, metaImageUrl, metaPageUrl, metaDescription]);
+
+  const [metaSnippet, setMetaSnippet] = useState(computedMetaSnippet);
+  useEffect(() => {
+    setMetaSnippet(computedMetaSnippet);
+  }, [computedMetaSnippet]);
 
   const updateLayer = useCallback((key: 'title' | 'subtitle', patch: Partial<TextLayer>) => {
     setConfig((current) => {
@@ -278,6 +297,75 @@ export function Editor() {
             suffix="px"
             onChange={(padding) => setConfig((current) => ({ ...current, padding }))}
           />
+        </Panel>
+
+        <Panel title="Meta tags">
+          <div className="flex flex-col gap-3">
+            <div>
+              <label htmlFor="meta-image-url" className="mb-1 block text-xs font-medium text-slate-400">
+                Image URL <span className="text-slate-600">(where your og.png will live)</span>
+              </label>
+              <input
+                id="meta-image-url"
+                type="url"
+                value={metaImageUrl}
+                onChange={(e) => setMetaImageUrl(e.target.value)}
+                placeholder="https://your-site.com/og.png"
+                className="w-full rounded-lg border border-white/10 bg-ink-800/60 px-3 py-2 font-mono text-xs text-slate-200 placeholder:text-slate-600 focus:border-violet-400/60 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="meta-page-url" className="mb-1 block text-xs font-medium text-slate-400">
+                Page URL
+              </label>
+              <input
+                id="meta-page-url"
+                type="url"
+                value={metaPageUrl}
+                onChange={(e) => setMetaPageUrl(e.target.value)}
+                placeholder="https://your-site.com"
+                className="w-full rounded-lg border border-white/10 bg-ink-800/60 px-3 py-2 font-mono text-xs text-slate-200 placeholder:text-slate-600 focus:border-violet-400/60 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="meta-description" className="mb-1 block text-xs font-medium text-slate-400">
+                Description <span className="text-slate-600">(defaults to subtitle)</span>
+              </label>
+              <textarea
+                id="meta-description"
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                placeholder={config.subtitle?.text || 'Optional description for og:description / twitter:description'}
+                rows={2}
+                className="w-full rounded-lg border border-white/10 bg-ink-800/60 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 focus:border-violet-400/60 focus:outline-none"
+              />
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <label htmlFor="meta-snippet" className="text-xs font-medium text-slate-400">
+                  Preview (editable)
+                </label>
+                <button
+                  type="button"
+                  onClick={copyMeta}
+                  className="rounded border border-white/10 px-2 py-1 text-[11px] font-semibold text-violet-300 transition hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
+                >
+                  Copy
+                </button>
+              </div>
+              <textarea
+                id="meta-snippet"
+                value={metaSnippet}
+                onChange={(e) => setMetaSnippet(e.target.value)}
+                rows={12}
+                spellCheck={false}
+                className="w-full rounded-lg border border-white/10 bg-ink-950/60 px-3 py-2 font-mono text-[11px] leading-relaxed text-slate-300 focus:border-violet-400/60 focus:outline-none"
+              />
+              <p className="mt-1 text-[10px] text-slate-600">
+                Edit any field above to regenerate, or tweak the raw output directly. Copy uses whatever's in this box.
+              </p>
+            </div>
+          </div>
         </Panel>
       </div>
     </div>
